@@ -18,3 +18,8 @@ class PartialUser(BaseModel):
     email : Optional[str] = None
     mob_no : Optional[str] = None
     address :Optional[str] = None
+
+
+class userpass(BaseModel):
+    password :str
+    

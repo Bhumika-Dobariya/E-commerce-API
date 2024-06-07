@@ -6,6 +6,10 @@ from sqlalchemy import pool
 from alembic import context
 from database.database import Base
 from src.models.user import User
+from src.models.OTP import OTP
+from src.models.neel import Neel
+from src.models.bhumika import Bhumika
+
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
