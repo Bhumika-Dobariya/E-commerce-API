@@ -10,7 +10,7 @@ class User(Base):
     last_name = Column(String(50),nullable=False)
     user_name = Column(String(50),nullable=False)
     password =Column(String(70),nullable= False)
-    email = Column(String(50),nullable= False)
+    email = Column(String(50),nullable= False,unique=True)
     mob_no = Column(String(20),nullable= False)
     address = Column(String(100),nullable= False)
     created_at = Column(DateTime,default=datetime.now)

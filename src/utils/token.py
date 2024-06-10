@@ -14,6 +14,9 @@ SECRET_KEY = str(os.environ.get("SECRET_KEY"))
 ALGORITHM = str(os.environ.get("ALGORITHM"))
 
 
+
+#payload
+
 def get_token(id):
     payload = {
         "user_id": id,
@@ -33,6 +36,38 @@ def get_token_logging(uname,password):
     access_token = jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
     print(type(access_token))
     return access_token
+
+
+
+#product id
+def get_token_product(id):
+    payload = {
+        "product_id": id,
+        "exp": datetime.now() + timedelta(minutes=15),
+    }
+    access_token = jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
+    print(type(access_token))
+    return access_token
+
+#decode id
+
+def decode_token_product_id(token):
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        product_id = payload.get("product_id")
+        if not product_id:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,detail="Invalid token",)
+        return product_id
+    except JWTError:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,detail="Invalid token",)
+
+
+
+
+
+
+
+
 
 
 #_____________________decode_____________________

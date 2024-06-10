@@ -2,7 +2,7 @@ from pydantic import BaseModel
 
 
 class OTPRequest(BaseModel):
-    user_id: str
+    email: str
 
 class OTPVerificationRequest(BaseModel):
     email: str
