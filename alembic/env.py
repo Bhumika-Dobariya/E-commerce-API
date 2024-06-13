@@ -9,6 +9,8 @@ from src.models.user import User
 from src.models.OTP import OTPS
 from src.models.products import Product
 from src.models.category import Category
+from src.models.address import Address
+from src.models.orders import Orders
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

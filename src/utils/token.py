@@ -26,20 +26,23 @@ def get_token(id):
     print(type(access_token))
     return access_token
 
+#decode id
 
-def get_token_logging(uname,password):
-    payload = {
-        "user_name": uname,
-        "user_password" : password,
-        "exp": datetime.now() + timedelta(minutes=15),
-    }
-    access_token = jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
-    print(type(access_token))
-    return access_token
+def decode_token_user_id(token):
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        user_id = payload.get("user_id")
+        if not user_id:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,detail="Invalid token",)
+        return user_id
+    except JWTError:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,detail="Invalid token",)
 
 
 
-#product id
+#___________product id__________________
+
+
 def get_token_product(id):
     payload = {
         "product_id": id,
@@ -69,22 +72,25 @@ def decode_token_product_id(token):
 
 
 
-
-#_____________________decode_____________________
-
-#id
-
-def decode_token_user_id(token):
+   
+"""       
+#email     
+def decode_token_user_email(token):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        user_id = payload.get("user_id")
-        if not user_id:
-            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,detail="Invalid token",)
-        return user_id
+        user_email = payload.get("user_email")
+        if not user_email:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Invalid token",
+            )
+        return user_email
     except JWTError:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,detail="Invalid token",)
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Invalid token",
+        )
         
-   
 #user_name     
   
 def decode_token_uname(token):
@@ -111,4 +117,4 @@ def decode_token_password(token):
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Invalid token",
         )
-        
+        """

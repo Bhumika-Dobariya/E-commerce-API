@@ -5,6 +5,7 @@ import uuid
 
 
 class OTPS(Base):
+    
     __tablename__ = 'OTP'
 
     id = Column(String(50), primary_key=True, default=str(uuid.uuid4()))
