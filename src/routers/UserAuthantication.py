@@ -16,6 +16,7 @@ from email.mime.multipart import MIMEMultipart
 
 pwd_context = CryptContext(schemes=["bcrypt"],deprecated = "auto")
 
+
 users = APIRouter(tags=["UserAuthantication"])
 db = Sessionlocal()
 

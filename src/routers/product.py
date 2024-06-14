@@ -86,7 +86,7 @@ def delete_product(id:str):
 
 @products.get("/search_products_by_category_id")
 def read_products_by_category(category_id: str):
-    db_product = db.query(Product).filter(Product.category_id == category_id).all()
+    db_product = db.query(Product).filter(Product.category_id == category_id,Product.is_active==True,Product.is_deleted==False).all()
     if not db_product:
         raise HTTPException(status_code=404, detail="No products found for the given category")
     return db_product

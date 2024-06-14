@@ -11,6 +11,10 @@ from src.models.products import Product
 from src.models.category import Category
 from src.models.address import Address
 from src.models.orders import Orders
+from src.models.cart import Cart
+from src.models.payment import Payment
+
+
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
