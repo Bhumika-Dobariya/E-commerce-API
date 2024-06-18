@@ -29,6 +29,7 @@ from config import db_url
 config = context.config
 config.set_section_option(config.config_ini_section,"sqlalchemy.url",db_url)
 
+
 # add your model's MetaData object here
 # for 'autogenerate' support
 # from myapp import mymodel
