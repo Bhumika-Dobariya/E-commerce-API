@@ -36,6 +36,8 @@ class UpdatePayment(BaseModel):
     billing_address: Optional[str] = None
     shipping_address: Optional[str] = None
     
+    
+    
 class PaymentIntentRequest(BaseModel):
     amount: int
-    currency: str = 'usd'
+    currency: str = 'INR'

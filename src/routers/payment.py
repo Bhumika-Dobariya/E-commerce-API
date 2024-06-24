@@ -5,12 +5,15 @@ from src.models.cart import Cart
 from src.schemas.payment import AllPayment,UpdatePayment,PaymentIntentRequest
 from datetime import datetime
 import stripe
+from logs.log_config import logger
+
+
 
 payments = APIRouter(tags=["Payment"])
 db = Sessionlocal()
 
 
-@payments.post("/create payment",response_model=AllPayment)
+@payments.post("/create_payment",response_model=AllPayment)
 def create_payment(payment_data:AllPayment):
     
         cart = db.query(Cart).filter(Cart.id ==payment_data.cart_id).first()
@@ -86,13 +89,19 @@ def delete_product(id:str):
 
 
 
-@payments.post("/create-payment-intent")
+@payments.post("/create_payment_intent")
 def create_payment_intent(request: PaymentIntentRequest):
     try:
+        logger.info(f"Received request to create payment intent with amount={request.amount} and currency={request.currency}")
+
         payment_intent = stripe.PaymentIntent.create(
-            amount=request.amount,
+            amount=request.amount*100,
             currency=request.currency
         )
+
+        logger.info(f"Payment intent created successfully. Client secret: {payment_intent.client_secret}")
+
         return {"client_secret": payment_intent.client_secret}
     except Exception as e:
+        logger.error(f"Error creating payment intent: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))

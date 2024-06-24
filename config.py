@@ -1,6 +1,6 @@
 from dotenv import load_dotenv
 load_dotenv()
-import os
+import os,stripe
 
 db_url = os.environ.get("DB_URL")
-stripe_secret_key = os.environ.get('STRIPE_SECRET_KEY')
+stripe.api_key= os.getenv("STRIPE_SECRET_KEY")

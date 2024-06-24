@@ -19,7 +19,7 @@ class Payment(Base):
     cvv = Column(String(4), nullable=False)
     expiry_month = Column(String(2), nullable=False)
     expiry_year = Column(String(4), nullable=False)
-    currency = Column(String(3), default='INR') 
+    currency = Column(String(3), default='USD') 
     status = Column(String, nullable=False, default="pending")
     payment_date = Column(DateTime, nullable=False)
     transaction_id = Column(String(50), nullable=True)

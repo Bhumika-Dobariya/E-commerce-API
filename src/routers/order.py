@@ -2,7 +2,7 @@ from fastapi import FastAPI, HTTPException, APIRouter
 from database.database import Sessionlocal
 from src.schemas.order import Allorder,UpdateOrder
 from src.models.orders import Orders
-from src.models.user import User
+from src.models.UserAuthantication import User
 from datetime import datetime
 import smtplib
 from email.mime.text import MIMEText

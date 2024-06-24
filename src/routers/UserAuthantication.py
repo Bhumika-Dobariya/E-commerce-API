@@ -1,8 +1,8 @@
 from fastapi import FastAPI, HTTPException, APIRouter,Depends,Header
 from database.database import Sessionlocal
 from passlib.context import CryptContext
-from src.schemas.user import UserAll,PartialUser
-from src.models.user import User
+from src.schemas.UserAuthantication import UserAll,PartialUser
+from src.models.UserAuthantication import User
 from src.models.OTP import OTPS
 from src.schemas.OTP import OTPRequest, OTPVerificationRequest
 
@@ -44,13 +44,13 @@ def create_user(user:UserAll):
 #_________________generate and verify otp_______________________
 
 
-def generate_otp(user_email: str):
+def generate_otp(user_id: str):
     otp_code = str(random.randint(100000, 999999))
     expiration_time = datetime.now() + timedelta(minutes=10)
 
     otp = OTPS(
         id =str(uuid.uuid4()),
-        user_email=user_email,
+        user_email=user_id,
         otp=otp_code,
         expiration_time=expiration_time
     )
