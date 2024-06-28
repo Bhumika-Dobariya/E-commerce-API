@@ -2,11 +2,13 @@ from fastapi import FastAPI, HTTPException, APIRouter
 from database.database import Sessionlocal
 from src.schemas.order import Allorder,UpdateOrder
 from src.models.orders import Orders
-from src.models.UserAuthantication import User
+from src.models.user import User
 from datetime import datetime
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+
+
 orders = APIRouter(tags=['orders'])
 db = Sessionlocal()
 
@@ -166,9 +168,10 @@ def read_All_order():
 
 
 
+
 #order conformation
 
-"""
+
 def send_order_confirmation_email(email: str,order ):
     
     order_details = f"Order ID: {order.id}\n" \
@@ -226,4 +229,4 @@ def send_order_conformation(order_id:str):
  
     send_order_confirmation_email(user.email, db_order)
     
-    return {"message": "Order confirmation email sent successfully"}"""
+    return {"message": "Order confirmation email sent successfully"}

@@ -1,12 +1,13 @@
-from fastapi import FastAPI, HTTPException, APIRouter
+from fastapi import FastAPI, HTTPException, APIRouter,Request
 from database.database import Sessionlocal
 from src.models.payment import Payment
 from src.models.cart import Cart
 from src.schemas.payment import AllPayment,UpdatePayment,PaymentIntentRequest
 from datetime import datetime
 import stripe
+from stripe import SignatureVerificationError
 from logs.log_config import logger
-
+import os
 
 
 payments = APIRouter(tags=["Payment"])
@@ -105,3 +106,33 @@ def create_payment_intent(request: PaymentIntentRequest):
     except Exception as e:
         logger.error(f"Error creating payment intent: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
+
+
+
+
+# Endpoint to handle Stripe webhook events
+
+
+@payments.post("/webhook_stripe")
+async def stripe_webhook(request: Request):
+    payload =  request.body()
+    sig_header = request.headers.get("Stripe-Signature", None)
+    stripe_webhook_secret = os.getenv("STRIPE_WEBHOOK_SECRET")
+    try:
+        event = stripe.Webhook.construct_event(
+            payload, sig_header, stripe_webhook_secret
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail="Invalid payload")
+    except SignatureVerificationError as e:
+        raise HTTPException(status_code=400, detail="Invalid signature")
+
+    if event["type"] == "payment_intent.succeeded":
+
+        print("Payment succeeded:", event)
+
+    elif event["type"] == "payment_intent.payment_failed":
+
+        print("Payment failed:", event)
+
+    return {"status": "success"}

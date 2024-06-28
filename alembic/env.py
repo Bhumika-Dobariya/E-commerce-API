@@ -1,3 +1,5 @@
+
+
 from logging.config import fileConfig
 
 from sqlalchemy import engine_from_config
@@ -6,14 +8,14 @@ from sqlalchemy import pool
 from alembic import context
 from database.database import Base
 from src.models.user import User
-from src.models.OTP import OTPS
+from src.models.otp import OTPS
 from src.models.products import Product
 from src.models.category import Category
 from src.models.address import Address
 from src.models.orders import Orders
 from src.models.cart import Cart
 from src.models.payment import Payment
-
+from src.models.review import ProductReview
 
 
 # this is the Alembic Config object, which provides

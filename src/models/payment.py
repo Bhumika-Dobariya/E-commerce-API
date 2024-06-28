@@ -9,7 +9,7 @@ class Payment(Base):
     __tablename__ = 'payments'
     
     id = Column(String(50), primary_key=True, default=str(uuid.uuid4())) 
-    user_id = Column(String(50), ForeignKey('UserInfo.id'), nullable=False)
+    user_id = Column(String(50), ForeignKey('user.id'), nullable=False)
     cart_id = Column(String(50),ForeignKey("carts.id"),nullable=False)
     order_id = Column(String(50),ForeignKey("order.id"), nullable=True)
     amount = Column(Float(10,3),nullable=False)

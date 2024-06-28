@@ -13,3 +13,11 @@ class UpdateCart(BaseModel):
     product_id : Optional[str] = None
     quantity : Optional[str] = None
    
+class Product(BaseModel):
+    id: int
+    name: str
+    price: float
+
+class CartItem(BaseModel):
+    product: Product
+    quantity: int

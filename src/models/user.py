@@ -7,7 +7,7 @@ import uuid
 
 class User(Base):
     
-    __tablename__ = 'UserInfo'
+    __tablename__ = 'user'
     
     id = Column(String(50), primary_key=True, default=str(uuid.uuid4()))
     first_name = Column(String(50),nullable=False)

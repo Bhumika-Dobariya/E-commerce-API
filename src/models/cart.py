@@ -1,4 +1,4 @@
-from sqlalchemy import Column,String,DateTime,Boolean,Text,ForeignKey,Integer,Float
+from sqlalchemy import Column,String,DateTime,Boolean,ForeignKey,Integer,Float
 from database.database import Base
 from datetime import datetime
 import uuid
@@ -8,7 +8,7 @@ class Cart(Base):
     __tablename__ = 'carts'
     
     id = Column(String(50), primary_key=True, default=str(uuid.uuid4()))
-    user_id = Column(String(50), ForeignKey('UserInfo.id'), nullable=False)
+    user_id = Column(String(50), ForeignKey('user.id'), nullable=False)
     product_id = Column(String(50), ForeignKey('products.id'), nullable=False)
     quantity = Column(Integer, nullable=False)
     price = Column(Float(10, 2), nullable=False)

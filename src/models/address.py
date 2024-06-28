@@ -12,7 +12,7 @@ class Address(Base):
     city = Column(String(20),nullable=False)
     state = Column(String(20),nullable=False)
     zip_code = Column(String(10),nullable=True)
-    user_id = Column(String(50),ForeignKey('UserInfo.id'),nullable=False)
+    user_id = Column(String(50),ForeignKey('user.id'),nullable=False)
     created_at = Column(DateTime, default=datetime.now)  
     modified_at = Column(DateTime, default=datetime.now, onupdate=datetime.utcnow) 
     is_active = Column(Boolean, default=True)

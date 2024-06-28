@@ -2,10 +2,10 @@ from fastapi import FastAPI, HTTPException, APIRouter,Depends,Header
 from database.database import Sessionlocal
 from passlib.context import CryptContext
 from src.schemas.UserAuthantication import UserAll,PartialUser
-from src.models.UserAuthantication import User
-from src.models.OTP import OTPS
+from src.models.user import User
+from src.models.otp import OTPS
 from src.schemas.OTP import OTPRequest, OTPVerificationRequest
-
+from logs.log_config import logger
 from src.utils.token import decode_token_user_id,get_token
 import random
 from datetime import datetime, timedelta
@@ -27,6 +27,9 @@ db = Sessionlocal()
 
 @users.post("/create_user",response_model=UserAll)
 def create_user(user:UserAll):
+    
+   logger.info("user is creating ") 
+   
    new_user = User(
        first_name = user.first_name,
        last_name = user.last_name,
@@ -36,26 +39,36 @@ def create_user(user:UserAll):
        mob_no = user.mob_no,
        address = user.address  
    )
+   logger.info("user created successfully")
+   logger.info("user is adding to database...")
+   
    db.add(new_user)
+   logger.info("user loaded successfuly")
+
    db.commit()
+   logger.success("user has been saved successfully")
+
    return new_user
 
 
 #_________________generate and verify otp_______________________
 
 
-def generate_otp(user_id: str):
+def generate_otp(user_email: str):
+    logger.info(f"Generating OTP for user with email: {user_email}")
     otp_code = str(random.randint(100000, 999999))
     expiration_time = datetime.now() + timedelta(minutes=10)
 
     otp = OTPS(
         id =str(uuid.uuid4()),
-        user_email=user_id,
+        user_email=user_email,
         otp=otp_code,
         expiration_time=expiration_time
     )
+    logger.info("Adding OTP to database")
     db.add(otp)
     db.commit()
+    logger.info("OTP generation and storage completed successfully")
     return otp_code
 
 
@@ -75,13 +88,19 @@ def send_otp_email(email: str, otp_code: str):
     message.attach(MIMEText(message_text, "plain"))
 
     try:
+        logger.info(f"Sending OTP email to {receiver_email}")
+        
         server = smtplib.SMTP("smtp.gmail.com", 587)
         server.starttls()
         server.login(sender_email, password)
         server.sendmail(sender_email, receiver_email, message.as_string())
         print("Mail sent successfully")
         server.quit()
+        
+        logger.info("OTP email sent successfully")
+        
     except Exception as e:
+        logger.error(f"Failed to send OTP email to {receiver_email}: {e}")
         print(f"Failed to send email: {e}")
 
 
@@ -92,11 +111,17 @@ def send_otp_email(email: str, otp_code: str):
 def generate_otp_endpoint(request: OTPRequest):
     user_email = request.email 
     user_info = db.query(User).filter(User.email == user_email,User.is_active==True,User.is_deleted == False).first()
+    
     if not user_info:
+        logger.warning(f"Invalid or missing email address: {user_email}")
         raise HTTPException(status_code=400, detail="Invalid or missing email address")
     
     otp_code = generate_otp(user_email)
+    logger.info(f"Generated OTP {otp_code} for email {user_email}")
+    
     send_otp_email(user_email, otp_code)
+    logger.info(f"OTP generated and sent successfully to email: {user_email}")
+    
     return {"message": "OTP generated and sent successfully to the provided email address."}
 
 
@@ -121,21 +146,27 @@ def verify_otp_endpoint(request: OTPVerificationRequest):
                 if user:
                     user.is_verified = True
                     db.commit()
+                    logger.info(f"OTP verification successful for user")
                     return {"message": "OTP verification successful"}
-                
+        
                 if not user.is_verified:
                     user.is_verified = False
+                    logger.error(f"User not found in database")
                     return {"error": "User is not verified"}
                        
             else:
+                logger.error("Incorrect OTP entered")
                 return {"error": "Incorrect OTP entered"}
         else:
             stored_otp.is_active = False
             stored_otp.is_deleted = True
-
+            
+            db.delete(user)
             db.commit()
+            logger.warning(f"OTP expired for user: {email}")
             return {"error": "OTP has expired" }
     else:
+        logger.warning(f"No active OTP found for user: {email}")
         return {"error": "No OTP record found for the user"}
 
 
@@ -149,12 +180,16 @@ def logging(uname: str, password: str):
     db_user = db.query(User).filter(User.user_name == uname,User.is_active == True,User.is_verified == True,User.is_deleted == False ).first()
 
     if db_user is None:
+        logger.warning(f"User '{uname}' not found")
         raise HTTPException(status_code=404, detail="User not found")
     
     if not pwd_context.verify(password,db_user.password):
+        logger.warning(f"Invalid password attempt for user '{uname}'")
         raise HTTPException(status_code=401,detail= "incorrect password")
     
-    access_token = get_token(db_user.id)  
+    access_token = get_token(db_user.id)
+    logger.info(f"User '{uname}' logged in successfully")
+      
     return access_token
 
 
@@ -166,7 +201,9 @@ def logging(uname: str, password: str):
 def read_user(token = Header(...)):
     user_id = decode_token_user_id(token)
     db_user =db.query(User).filter(User.id==user_id,User.is_active==True,User.is_verified==True,User.is_deleted==False).first()
+    
     if db_user is None:
+        logger.warning("No active and verified users found")
         raise HTTPException(status_code=404,detail ="user not found")
     return db_user
 
@@ -178,6 +215,7 @@ def read_user(token = Header(...)):
 def read_all_user():
     db_user =db.query(User).filter(User.is_active == True, User.is_verified==True,User.is_deleted== False).all()
     if db_user is None:
+        logger.warning("No active and verified users found")
         raise HTTPException(status_code=404,detail ="user not found")
     return db_user
 
@@ -190,6 +228,7 @@ def update_user(usern: UserAll, token: str = Header(...)):
     db_user = db.query(User).filter(User.id == user_id, User.is_active == True, User.is_verified == True, User.is_deleted == False).first()
     
     if db_user is None:
+        logger.warning(f"User not found for token: {token}")
         raise HTTPException(status_code=404, detail="User not found")
     
     if not db_user.is_verified:

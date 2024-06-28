@@ -1,4 +1,4 @@
-from sqlalchemy import Column,String,DateTime,Boolean,ForeignKey
+from sqlalchemy import Column,String,DateTime,Boolean
 from database.database import Base
 from datetime import datetime
 import uuid
@@ -6,7 +6,7 @@ import uuid
 
 class OTPS(Base):
     
-    __tablename__ = 'OTP'
+    __tablename__ = 'otp'
 
     id = Column(String(50), primary_key=True, default=str(uuid.uuid4()))
     user_email = Column(String(50), nullable=False)  

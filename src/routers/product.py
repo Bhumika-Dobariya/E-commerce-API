@@ -15,10 +15,19 @@ db = Sessionlocal()
 
 @products.post("/create_products",response_model=AllProduct)
 def create_products(product:AllProduct):
+    
+    if product.discount_percent is not None:
+        cal_discount = (product.product_price * product.discount_percent) / 100
+        discount_price = product.product_price - cal_discount
+    else:
+        discount_price = Product.product_price
+    
     new_product = Product(
     name  = product.name,
     description = product.description,
-    price = product.price,
+    product_price = product.product_price,
+    discount_percent = product.discount_percent,
+    discount_price = discount_price,
     category_id = product.category_id,
     stock_quantity = product.stock_quantity  
     )
@@ -41,7 +50,7 @@ def get_products(id:str):
 #get all products
 
 @products.get("/get_all_products",response_model=list[AllProduct])
-def get_all_category():
+def get_all_products():
     db_products = db.query(Product).filter(Product.is_active==True,Product.is_deleted==False).all()
     if db_products is None:
         raise HTTPException(status_code=404,detail ="products not found")
@@ -90,3 +99,4 @@ def read_products_by_category(category_id: str):
     if not db_product:
         raise HTTPException(status_code=404, detail="No products found for the given category")
     return db_product
+
