@@ -29,7 +29,7 @@ def create_products(product:AllProduct):
     discount_percent = product.discount_percent,
     discount_price = discount_price,
     category_id = product.category_id,
-    stock_quantity = product.stock_quantity  
+    quantity = product.quantity  
     )
     db.add(new_product)
     db.commit()

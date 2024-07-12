@@ -16,7 +16,7 @@ class Product(Base):
     discount_percent = Column(Float(5,2), nullable=False) 
     discount_price = Column(Float(10,2),nullable=False)      
     category_id = Column(String(50), ForeignKey("categories.id"), nullable=False)
-    stock_quantity = Column(Integer, default=0)        
+    quantity = Column(Integer, default=0)        
     created_at = Column(DateTime, default=datetime.now) 
     modified_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.now)  
     is_active = Column(Boolean, default=True)     

@@ -1,8 +1,9 @@
 from fastapi import FastAPI, HTTPException, APIRouter
 from database.database import Sessionlocal
-from src.schemas.review import ProductReviewCreate,ProductReviewUpdate,ProductStar
+from src.schemas.review import ProductReviewCreate,ProductReviewUpdate
 from src.models.review import ProductReview
 import uuid
+from sqlalchemy import func
 
 Reviews = APIRouter(tags=["user rating and review"])
 db = Sessionlocal()
@@ -16,15 +17,12 @@ def create_review(review: ProductReviewCreate):
         id=str(uuid.uuid4()), 
         user_id = review.user_id,
         product_id=review.product_id,  
-        description=review.description,
-        stars=review.stars
+        comment=review.comment,
+        rating=review.rating
     )
     db.add(customer_review) 
     db.commit() 
     return customer_review
-
-
-
 
 #read review
 
@@ -89,9 +87,49 @@ def count_reviews():
     return total_reviews
 
 
-"""@Reviews.get("/count_reviews_of_product")
-def count_reviews(product_id:str):
-    product_reviews = db.query(ProductReview).filter(ProductReview.id==product_id,ProductReview.is_active == True, ProductReview.is_deleted == False).count()
-    if product_reviews is None:
-            raise HTTPException(status_code=404, detail="No reviews found for this product")
-    return  {"product_id": product_id, "review_count": product_reviews}"""
+
+#1 product review
+
+@Reviews.get("/count_reviews_of_product")
+def count_reviews(product_id: str):
+    product_reviews_count = db.query(ProductReview).filter(ProductReview.product_id == product_id, ProductReview.is_active == True,ProductReview.is_deleted == False).count()
+    
+    if product_reviews_count == 0:
+        raise HTTPException(status_code=404, detail="No reviews found for this product")
+    
+    return {"product_id": product_id, "review_count": product_reviews_count}
+
+
+
+#average rating
+
+def get_qualitative_rating(avg_rating: float):
+    if avg_rating >= 4.5:
+        return "Excellent"
+    elif avg_rating >= 4.0:
+        return "Very Good"
+    elif avg_rating >= 3.0:
+        return "Good"
+    elif avg_rating >= 2.0:
+        return "Average"
+    else:
+        return "Poor"
+
+@Reviews.get("/average_rating")
+def average_rating(product_id: str):
+    average_rating = db.query(func.avg(ProductReview.rating)).filter(ProductReview.product_id == product_id).scalar()
+
+    if average_rating is None:
+        raise HTTPException(status_code=404, detail="No reviews found for the product")
+
+    avg_rating = round(float(average_rating), 2)
+
+    qualitative_rating = get_qualitative_rating(avg_rating)
+
+    return {
+        "product_id": product_id,
+        "average_rating": avg_rating,
+        "qualitative_rating": qualitative_rating
+    }
+
+

@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional,List
 
 class Allorder(BaseModel):
     
@@ -7,13 +7,17 @@ class Allorder(BaseModel):
     product_id :str
     quantity :int
     status:str
-    unit_price :float
+ 
 
 
 class UpdateOrder(BaseModel):
     
     user_id :Optional[str] = None
     product_id :Optional[str] = None
-    quantity :Optional[str] = None
+    quantity :Optional[int] = None
     status:Optional[str] = None
-    unit_price :Optional[str] = None
+    total_price :Optional[str] = None
+    
+    
+class ordern(BaseModel):
+    Items: List[Allorder]

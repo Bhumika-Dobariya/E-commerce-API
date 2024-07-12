@@ -1,12 +1,16 @@
 from fastapi import FastAPI, HTTPException, APIRouter
 from database.database import Sessionlocal
-from src.schemas.order import Allorder,UpdateOrder
+from src.schemas.order import Allorder,UpdateOrder,ordern
+from src.schemas.cart import Carts
 from src.models.orders import Orders
 from src.models.user import User
+from src.models.cart import Cart,CartItem
+from src. models.products import Product
 from datetime import datetime
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from typing import List
 
 
 orders = APIRouter(tags=['orders'])
@@ -16,30 +20,37 @@ db = Sessionlocal()
 
 #create order
 
-@orders.post("/create_orders",response_model=Allorder)
-def create_order(Order: Allorder):
-    existing_order = db.query(Orders).filter(
-        Orders.user_id == Order.user_id,
-        Orders.product_id == Order.product_id,
-        Orders.is_active == True,
-        Orders.is_deleted == False
-    ).first()
+@orders.post("/create_orders", response_model=List[Allorder])
+def create_orders(order_data: ordern):
+    order_items = []
 
-    if existing_order:
-        raise HTTPException(status_code=400, detail="Duplicate order not allowed")
+    for item in order_data.Items:
+        product = db.query(Product).filter(Product.id == item.product_id).first()
+        if not product:
+            raise HTTPException(status_code=404, detail=f"Product with id {item.product_id} not found")
 
-    new_order = Orders(
-        user_id=Order.user_id,
-        product_id=Order.product_id,
-        quantity=Order.quantity,
-        status=Order.status,
-        unit_price=Order.unit_price
-    )
-    
-    db.add(new_order)
+        cart = db.query(Cart).filter(Cart.id == item.cart_id).first()
+        if not cart:
+            raise HTTPException(status_code=404, detail=f"Cart with id {item.cart_id} not found")
+
+        
+        total_price = product.discount_price * item.quantity
+
+        order_item = Orders(
+            user_id=item.user_id,
+            product_id=item.product_id,
+            cart_id=item.cart_id,
+            quantity=item.quantity,
+            status=item.status,
+            total_price=total_price,   
+        )
+
+        db.add(order_item)
+        order_items.append(item)
+
     db.commit()
 
-    return new_order
+    return order_items
 
 
 
@@ -51,6 +62,28 @@ def read_order(id:str):
     if db_order is None:
         raise HTTPException(status_code=404,detail="order not found")
     return db_order
+
+
+#cart
+@orders.get("/get_orders_by_cart",response_model=List[Allorder])
+def read_order(cart_id: str):
+        db_cart = db.query(Cart).filter(Cart.id == cart_id).first()
+        if not db_cart:
+            raise HTTPException(status_code=404, detail="Cart not found")
+
+        db_cart_items = db.query(CartItem).filter(CartItem.cart_id == cart_id).all()
+
+        orders = []
+        for item in db_cart_items:
+         order = Allorder(
+            user_id=db_cart.user_id,
+            product_id=item.product_id,
+            quantity=item.quantity,
+            status=item.status,
+        )
+        orders.append(order)
+
+        return orders
 
 
 #get all order
@@ -172,37 +205,36 @@ def read_All_order():
 #order conformation
 
 
-def send_order_confirmation_email(email: str,order ):
-    
+def send_order_confirmation_email(email: str, order):
     order_details = f"Order ID: {order.id}\n" \
                     f"User ID: {order.user_id}\n" \
                     f"Product ID: {order.product_id}\n" \
                     f"Quantity: {order.quantity}\n" \
                     f"Status: {order.status}\n" \
-                    f"Unit Price: {order.unit_price}\n" \
-                  
-                    
+                    f"Total Price: {order.total_price}\n"
+
     sender_email = "bhumikadobariya2412@gmail.com"
-    receiver_email = email
     password = "qzdjaauunsmgrvgd"
     subject = "Order Confirmation"
-    message_text = f"Thank you for your order! Your order details: {order_details}"
+    message_text = f"Thank you for your order! Your order details:\n\n{order_details}"
 
     message = MIMEMultipart()
     message["From"] = sender_email
-    message["To"] = receiver_email
+    message["To"] = email
     message["Subject"] = subject
-    
-    
+
     message.attach(MIMEText(message_text, "plain"))
 
     try:
         server = smtplib.SMTP("smtp.gmail.com", 587)
         server.starttls()
         server.login(sender_email, password)
-        server.sendmail(sender_email, receiver_email, message.as_string())
+        server.sendmail(sender_email, email, message.as_string())
         print("Mail sent successfully")
         server.quit()
+    except smtplib.SMTPRecipientsRefused as e:
+        print(f"Failed to send email: Invalid recipient email address - {email}")
+       
     except Exception as e:
         print(f"Failed to send email: {e}")
         
@@ -212,21 +244,31 @@ def send_order_confirmation_email(email: str,order ):
 
 @orders.post("/send_order_conformation")
 def send_order_conformation(order_id:str):
-    db_order = db.query(Orders).filter(Orders.id ==order_id).first()
+   db_order = db.query(Orders).filter(Orders.id == order_id).first()
     
-    if db_order is None:
+   if db_order is None:
         raise HTTPException(status_code=404, detail="Order not found")
     
-    user_id = db_order.user_id
-    user = db.query(User).filter(User.id == user_id).first()
+   db_cart = db.query(Cart).filter(Cart.id == db_order.cart_id).first()
     
-    if user is None:
+   if db_cart is None:
+        raise HTTPException(status_code=404, detail="Cart not found for the order")
+    
+   cart_products = db.query(Product).filter(Product.cart_id == db_cart.id).all()
+    
+   if not cart_products:
+        raise HTTPException(status_code=404, detail="No products found in the cart")
+    
+   user_id = db_order.user_id
+   user = db.query(User).filter(User.id == user_id).first()
+    
+   if user is None:
         raise HTTPException(status_code=404, detail="User not found")
     
-    if not user.email:
+   if not user.email:
         raise HTTPException(status_code=400, detail="User email not provided")
     
  
-    send_order_confirmation_email(user.email, db_order)
+   send_order_confirmation_email(user.email, db_order)
     
-    return {"message": "Order confirmation email sent successfully"}
+   return {"message": "Order confirmation email sent successfully"}

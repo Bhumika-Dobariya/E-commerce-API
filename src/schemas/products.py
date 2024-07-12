@@ -7,7 +7,7 @@ class AllProduct(BaseModel):
     product_price: float
     discount_percent : float
     category_id:str
-    stock_quantity: int
+    quantity: int
     
 
 class PartialUpadate(BaseModel):
@@ -16,4 +16,4 @@ class PartialUpadate(BaseModel):
     product_price: Optional[str] = None
     discount_percent: Optional[str] = None
     category_id:Optional[str] = None
-    stock_quantity: Optional[str] = None
+    quantity: Optional[str] = None

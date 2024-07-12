@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException, APIRouter,Request
 from database.database import Sessionlocal
 from src.models.payment import Payment
-from src.models.cart import Cart
+from src.models.cart import Cart,CartItem
 from src.schemas.payment import AllPayment,UpdatePayment,PaymentIntentRequest
 from datetime import datetime
 import stripe
@@ -17,7 +17,7 @@ db = Sessionlocal()
 @payments.post("/create_payment",response_model=AllPayment)
 def create_payment(payment_data:AllPayment):
     
-        cart = db.query(Cart).filter(Cart.id ==payment_data.cart_id).first()
+        cart = db.query(CartItem).filter(CartItem.id ==payment_data.cart_id).first()
         if cart is None:
             raise HTTPException(status_code=404,detail= "cart not found")
         

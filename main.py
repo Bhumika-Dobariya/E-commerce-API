@@ -7,7 +7,7 @@ from src.routers.order import orders
 from src.routers.cart import carts
 from src.routers.payment import payments
 from src.routers.review import Reviews
-
+from src.routers.shipping import Shippings
 
 
 
@@ -20,7 +20,7 @@ app.include_router(orders)
 app.include_router(carts)
 app.include_router(payments)
 app.include_router(Reviews)
-
+app.include_router(Shippings)
 
 
 

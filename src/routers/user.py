@@ -57,7 +57,7 @@ def create_user(user:UserAll):
 def generate_otp(user_email: str):
     logger.info(f"Generating OTP for user with email: {user_email}")
     otp_code = str(random.randint(100000, 999999))
-    expiration_time = datetime.now() + timedelta(minutes=10)
+    expiration_time = datetime.now() + timedelta(seconds=10)
 
     otp = OTPS(
         id =str(uuid.uuid4()),
@@ -157,17 +157,11 @@ def verify_otp_endpoint(request: OTPVerificationRequest):
             else:
                 logger.error("Incorrect OTP entered")
                 return {"error": "Incorrect OTP entered"}
-        else:
-            stored_otp.is_active = False
-            stored_otp.is_deleted = True
-            
-            db.delete(user)
-            db.commit()
-            logger.warning(f"OTP expired for user: {email}")
-            return {"error": "OTP has expired" }
-    else:
-        logger.warning(f"No active OTP found for user: {email}")
-        return {"error": "No OTP record found for the user"}
+        else: 
+          db.delete(stored_otp)
+          db.commit()
+          logger.warning(f"OTP expired for user: {email}")
+          return {"error": "OTP has expired" }
 
 
 

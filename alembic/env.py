@@ -16,6 +16,9 @@ from src.models.orders import Orders
 from src.models.cart import Cart
 from src.models.payment import Payment
 from src.models.review import ProductReview
+from src.models.shipping import Shipping
+
+
 
 
 # this is the Alembic Config object, which provides
