@@ -3,18 +3,23 @@ from database.database import Sessionlocal
 from src.schemas.address import AllAddress,AddressUpdate
 import uuid
 from src.models.address import Address
+from logs.log_config import logger
+from typing import List
 
 
 address = APIRouter(tags=["Address"])
 db = Sessionlocal()
 
 
-#create address
+#______________create_user_address___________________
 
-@address.post("/create_user_address",response_model=AllAddress)
+
+@address.post("/create_user_address", response_model=AllAddress)
 def create_address(Add: AllAddress):
-    existing_address = db.query(Address).filter(Address.user_id == Add.user_id,Address.is_active==True,Address.is_deleted==False).first()
+    logger.info("Creating address for user_id:", Add.user_id)
+    existing_address = db.query(Address).filter(Address.user_id == Add.user_id, Address.is_active == True, Address.is_deleted == False).first()
     if existing_address:
+        logger.error("User with user_id: already has an address", Add.user_id)
         raise HTTPException(status_code=400, detail="User already has an address")
 
     user_address = Address(
@@ -26,80 +31,91 @@ def create_address(Add: AllAddress):
     )
     db.add(user_address)
     db.commit()
+    logger.info("Address created for user_id:", Add.user_id)
     return user_address
-    
-    
- #get address
-    
-@address.get("/read_address",response_model=AllAddress)
-def read_address(id:str):
-    db_address = db.query(Address).filter(Address.id==id,Address.is_active==True,Address.is_deleted==False).first()
+
+
+
+#____________read_address_________________
+
+@address.get("/read_address", response_model=AllAddress)
+def read_address(id: str):
+    logger.info("Fetching address with id:", id)
+    db_address = db.query(Address).filter(Address.id == id, Address.is_active == True, Address.is_deleted == False).first()
     if db_address is None:
-        raise HTTPException(status_code=404,detail="address not found")
+        logger.error("Address not found with id:", id)
+        raise HTTPException(status_code=404, detail="Address not found")
     return db_address
 
 
-#get all address
+#_____________get_all_address________________
 
-@address.get("/get_all_address",response_model=list[AllAddress])
+@address.get("/get_all_address", response_model=List[AllAddress])
 def get_all_address():
-    db_address = db.query(Address).filter(Address.is_active==True,Address.is_deleted==False).all()
-    if db_address is None:
-        raise HTTPException(status_code=404,detail="address not found")
-    return db_address
+    logger.info("Fetching all active and non-deleted addresses")
+    db_addresses = db.query(Address).filter(Address.is_active == True, Address.is_deleted == False).all()
+    if not db_addresses:
+        logger.error("No addresses found")
+        raise HTTPException(status_code=404, detail="Addresses not found")
+    return db_addresses
 
 
-
-
-#update address
+#______________update_address________________
 
 @address.patch("/update_address", response_model=AllAddress)
-def update_address(addr: AddressUpdate,id:str):
-    
-    db_address = db.query(Address).filter(Address.id == id, Address.is_active == True,Address.is_deleted==False).first()
+def update_address(addr: AddressUpdate, id: str):
+    logger.info("Updating address with id:", id)
+    db_address = db.query(Address).filter(Address.id == id, Address.is_active == True, Address.is_deleted == False).first()
 
-    if  db_address is None:
-        raise HTTPException(status_code=404, detail="address not found")
+    if db_address is None:
+        logger.error("Address not found with id:", id)
+        raise HTTPException(status_code=404, detail="Address not found")
 
     for field_name, value in addr.dict().items():
         if value is not None:
-            setattr( db_address, field_name, value)
+            setattr(db_address, field_name, value)
 
     db.commit()
-    return  db_address
+    logger.info("Address updated with id:", db_address.id)
+    return db_address
 
 
-
-#delete address
+#_____________delete_address______________
 
 @address.delete("/delete_address")
-def delete_address(id:str):
-    db_address = db.query(Address).filter(Address.id==id,Address.is_active==True,Address.is_deleted==False).first()
+def delete_address(id: str):
+    logger.info("Deleting address with id:", id)
+    db_address = db.query(Address).filter(Address.id == id, Address.is_active == True, Address.is_deleted == False).first()
     if db_address is None:
-        raise HTTPException(status_code=404,detail="address not found")
-    db_address.is_active=False
-    db_address.is_deleted =True
+        logger.error("Address not found with id:", id)
+        raise HTTPException(status_code=404, detail="Address not found")
+    db_address.is_active = False
+    db_address.is_deleted = True
     db.commit()
-    return {"message": "address deleted successfully"}
+    logger.info("Address deleted with id:", db_address.id)
+    return {"message": "Address deleted successfully"}
 
 
+#________________users_in_gujarat_______________
 
-#users_in_gujarat
-
-@address.get("/users_in_gujarat", response_model=list[AllAddress])
+@address.get("/users_in_gujarat", response_model=List[AllAddress])
 def get_users_in_gujarat():
-    users_in_gujarat = db.query(Address).filter(Address.state == "gujarat",Address.is_active==True,Address.is_deleted==False).all()
+    logger.info("Fetching users in Gujarat")
+    users_in_gujarat = db.query(Address).filter(Address.state == "gujarat", Address.is_active == True, Address.is_deleted == False).all()
     if not users_in_gujarat:
+        logger.error("No users found in Gujarat")
         raise HTTPException(status_code=404, detail="No users found in Gujarat")
     return users_in_gujarat
 
 
 
-#search_address_by_user_id
+#____________search_address_by_user_id___________
 
 @address.get("/search_address_by_user_id")
-def read_address_by_user(user_id:str):
-    db_address = db.query(Address).filter(Address.user_id == user_id,Address.is_active==True,Address.is_deleted==False).all()
+def read_address_by_user(user_id: str):
+    logger.info("Fetching addresses for user_id:", user_id)
+    db_address = db.query(Address).filter(Address.user_id == user_id, Address.is_active == True, Address.is_deleted == False).all()
     if not db_address:
+        logger.error("No address found for user_id:", user_id)
         raise HTTPException(status_code=404, detail="No address found for the given user")
     return db_address

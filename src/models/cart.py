@@ -4,6 +4,7 @@ from datetime import datetime
 import uuid
 
 class Cart(Base):
+    
     __tablename__ = 'carts'
 
     id = Column(String(50), primary_key=True, default=str(uuid.uuid4()))
@@ -16,6 +17,7 @@ class Cart(Base):
 
 
 class CartItem(Base):
+    
     __tablename__ = 'cart_items'
 
     id = Column(String(50), primary_key=True, default=str(uuid.uuid4()))

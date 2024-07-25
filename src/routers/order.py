@@ -41,14 +41,16 @@ def create_orders(order_data: ordern):
             product_id=item.product_id,
             cart_id=item.cart_id,
             quantity=item.quantity,
-            status=item.status,
+            status="pending",
             total_price=total_price,   
         )
 
         db.add(order_item)
         order_items.append(item)
-
+        
+    order_item.status= "Done"
     db.commit()
+    
 
     return order_items
 
@@ -84,6 +86,27 @@ def read_order(cart_id: str):
         orders.append(order)
 
         return orders
+    
+    
+#Retrieve all orders placed by a specific user.
+
+@orders.get("/get_orders_by_user", response_model=List[Allorder])
+def get_orders_by_user(user_id: str):
+    orders = db.query(Orders).filter(Orders.user_id == user_id, Orders.is_active == True, Orders.is_deleted == False).all()
+    if not orders:
+        raise HTTPException(status_code=404, detail="No orders found for the user")
+    return orders
+
+
+
+#Retrieve all orders containing a specific product.
+
+@orders.get("/get_orders_by_product", response_model=List[Allorder])
+def get_orders_by_product(product_id: str):
+    orders = db.query(Orders).filter(Orders.product_id == product_id, Orders.is_active == True, Orders.is_deleted == False).all()
+    if not orders:
+        raise HTTPException(status_code=404, detail="No orders found for the product")
+    return orders
 
 
 #get all order
@@ -94,6 +117,7 @@ def read_All_order():
     if db_order is None:
         raise HTTPException(status_code=404,detail="order not found")
     return db_order
+
 
 
 
@@ -201,6 +225,41 @@ def read_All_order():
 
 
 
+#Reorder a Previous Order
+
+@orders.post("/reorder/{order_id}", response_model=Allorder)
+def reorder(order_id: str):
+    original_order = db.query(Orders).filter(Orders.id == order_id, Orders.is_active == True, Orders.is_deleted == False).first()
+    if not original_order:
+        raise HTTPException(status_code=404, detail="Order not found")
+
+    new_order = Orders(
+        user_id=original_order.user_id,
+        product_id=original_order.product_id,
+        cart_id=original_order.cart_id,
+        quantity=original_order.quantity,
+        status="pending",
+        total_price=original_order.total_price,
+    )
+
+    db.add(new_order)
+    db.commit()
+    return new_order
+
+
+#archive_order
+
+@orders.patch("/archive_order/{order_id}")
+def archive_order(order_id: str):
+    order = db.query(Orders).filter(Orders.id == order_id, Orders.is_active == True, Orders.is_deleted == False).first()
+    if not order:
+        raise HTTPException(status_code=404, detail="Order not found")
+    
+    order.is_active = False
+    order.is_deleted = True
+    order.is_archived = True
+    db.commit()
+    return {"message": "Order archived successfully"}
 
 #order conformation
 

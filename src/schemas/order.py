@@ -4,6 +4,7 @@ from typing import Optional,List
 class Allorder(BaseModel):
     
     user_id :str
+    cart_id : str
     product_id :str
     quantity :int
     status:str
@@ -13,6 +14,7 @@ class Allorder(BaseModel):
 class UpdateOrder(BaseModel):
     
     user_id :Optional[str] = None
+    cart_id : Optional[str] = None
     product_id :Optional[str] = None
     quantity :Optional[int] = None
     status:Optional[str] = None

@@ -5,11 +5,22 @@ class AllProduct(BaseModel):
     name: str
     description: str
     product_price: float
-    discount_percent : float
+    discount_percent: Optional[float] = None 
     category_id:str
     quantity: int
     
 
+class ProductResponse(BaseModel):
+    id: str
+    name: str
+    description: str
+    product_price: float
+    discount_percent: Optional[float] = None
+    discount_price: float
+    category_id: str
+    quantity: int
+    
+    
 class PartialUpadate(BaseModel):
     name: Optional[str] = None
     description: Optional[str] = None
