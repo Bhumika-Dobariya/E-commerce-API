@@ -11,8 +11,8 @@ address = APIRouter(tags=["Address"])
 db = Sessionlocal()
 
 
-#______________create_user_address___________________
 
+#______________create user address___________________
 
 @address.post("/create_user_address", response_model=AllAddress)
 def create_address(Add: AllAddress):
@@ -36,7 +36,7 @@ def create_address(Add: AllAddress):
 
 
 
-#____________read_address_________________
+#____________read address_________________
 
 @address.get("/read_address", response_model=AllAddress)
 def read_address(id: str):
@@ -48,7 +48,8 @@ def read_address(id: str):
     return db_address
 
 
-#_____________get_all_address________________
+
+#_____________get all address________________
 
 @address.get("/get_all_address", response_model=List[AllAddress])
 def get_all_address():
@@ -60,7 +61,8 @@ def get_all_address():
     return db_addresses
 
 
-#______________update_address________________
+
+#______________update address________________
 
 @address.patch("/update_address", response_model=AllAddress)
 def update_address(addr: AddressUpdate, id: str):
@@ -80,7 +82,8 @@ def update_address(addr: AddressUpdate, id: str):
     return db_address
 
 
-#_____________delete_address______________
+
+#_____________delete address______________
 
 @address.delete("/delete_address")
 def delete_address(id: str):
@@ -96,7 +99,8 @@ def delete_address(id: str):
     return {"message": "Address deleted successfully"}
 
 
-#________________users_in_gujarat_______________
+
+#________________users in gujarat_______________
 
 @address.get("/users_in_gujarat", response_model=List[AllAddress])
 def get_users_in_gujarat():
@@ -109,7 +113,7 @@ def get_users_in_gujarat():
 
 
 
-#____________search_address_by_user_id___________
+#____________search address by user id___________
 
 @address.get("/search_address_by_user_id")
 def read_address_by_user(user_id: str):

@@ -51,8 +51,8 @@ def read_review(id: str):
     
     return review
 
-# ________________Get all reviews______________
 
+# ________________Get all reviews______________
 
 @Reviews.get("/get_all_review", response_model=List[ProductReviewCreate])
 def get_all_review():
@@ -71,7 +71,6 @@ def get_all_review():
 
 
 # ________________Update review___________________
-
 
 @Reviews.patch("/update_review", response_model=ProductReviewCreate)
 def update_review(Reviews: ProductReviewUpdate, id: str):
@@ -94,8 +93,8 @@ def update_review(Reviews: ProductReviewUpdate, id: str):
     return db_review
 
 
-# ___________Delete review______________
 
+# ___________Delete review______________
 
 @Reviews.delete("/delete_review")
 def delete_review(id: str):
@@ -119,7 +118,6 @@ def delete_review(id: str):
 
 # _____________Count all reviews________________
 
-
 @Reviews.get("/reviews_count")
 def count_reviews():
     logger.info("Counting all active and non-deleted reviews")
@@ -129,6 +127,7 @@ def count_reviews():
     logger.info(f"Total reviews count: {total_reviews}")
     
     return total_reviews
+
 
 
 # _____________Count reviews for a product_______________
@@ -163,7 +162,6 @@ def get_qualitative_rating(avg_rating: float):
     
     
 #__________________average_rating______________
-
 
 @Reviews.get("/average_rating")
 def average_rating(product_id: str):

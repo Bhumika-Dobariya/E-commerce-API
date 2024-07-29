@@ -14,8 +14,8 @@ payments = APIRouter(tags=["Payment"])
 db = Sessionlocal()
 
 
-#___________create_payment_________________
 
+#___________create_payment_________________
 
 @payments.post("/create_payment", response_model=AllPayment)
 def create_payment(payment_data: AllPayment):
@@ -54,7 +54,6 @@ def create_payment(payment_data: AllPayment):
 
 #_____________get_payments_________________
 
-
 @payments.get("/get_payments", response_model=AllPayment)
 def get_payments(id: str):
     logger.info("Fetching payment with id: %s", id)
@@ -68,7 +67,6 @@ def get_payments(id: str):
 
 
 #________________delete_payments_________________
-
 
 @payments.delete("/delete_payments")
 def delete_payment(id: str):
@@ -86,7 +84,6 @@ def delete_payment(id: str):
 
 
 #________________create_payment_intent________________
-
 
 @payments.post("/create_payment_intent")
 def create_payment_intent(request: PaymentIntentRequest):
@@ -107,7 +104,6 @@ def create_payment_intent(request: PaymentIntentRequest):
 
 
 #___________webhook_stripe________________
-
 
 @payments.post("/webhook_stripe")
 async def stripe_webhook(request: Request):

@@ -11,8 +11,8 @@ products = APIRouter(tags=["Products"])
 db = Sessionlocal()
 
 
-#____________create_products____________
 
+#____________create_products____________
 
 @products.post("/create_products", response_model=ProductResponse)
 def create_products(product: AllProduct):
@@ -41,6 +41,7 @@ def create_products(product: AllProduct):
     return new_product
 
 
+
 #___________get_products________
 
 @products.get("/get_products", response_model=AllProduct)
@@ -56,7 +57,6 @@ def get_products(id: str):
 
 #__________get_all_products____________
 
-
 @products.get("/get_all_products", response_model=List[AllProduct])
 def get_all_products():
     logger.info("Fetching all active and non-deleted products")
@@ -67,8 +67,8 @@ def get_all_products():
     return db_products
 
 
-#__________update_product_by_patch_____________
 
+#__________update_product_by_patch_____________
 
 @products.patch("/update_product_by_patch", response_model=AllProduct)
 def update_product_patch(product: PartialUpadate, id: str):
@@ -86,6 +86,7 @@ def update_product_patch(product: PartialUpadate, id: str):
     db.commit()
     logger.info("Product updated with id: %s", db_product.id)
     return db_product
+
 
 
 #_____________delete_products______________
@@ -149,7 +150,6 @@ def increase_product_quantity(product_id: str, quantity: int):
 
 
 #___________decrease_product_quantity_______________
-
 
 @products.patch("/decrease_product_quantity", response_model=AllProduct)
 def decrease_product_quantity(product_id: str, quantity: int):

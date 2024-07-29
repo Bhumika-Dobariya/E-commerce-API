@@ -13,7 +13,6 @@ db = Sessionlocal()
 
 #____________________create_categories______________
 
-
 @category.post("/create_categories", response_model=Allcategories)
 def create_category(category: Allcategories):
     logger.info("Creating new category with name: ", category.name)
@@ -32,7 +31,6 @@ def create_category(category: Allcategories):
 
 #_________________get_category_________________
 
-
 @category.get("/get_category", response_model=Allcategories)
 def get_category(id: str):
     logger.info("Fetching category with id:", id)
@@ -45,8 +43,8 @@ def get_category(id: str):
 
 
 
-#_________________get_all_category_______________
 
+#_________________get_all_category_______________
 
 @category.get("/get_all_category", response_model=List[Allcategories])
 def get_all_category():
@@ -59,8 +57,8 @@ def get_all_category():
     return db_category
 
 
-#_____________update_category_by_patch__________________
 
+#_____________update_category_by_patch__________________
 
 @category.patch("/update_category_by_patch", response_model=Allcategories)
 def update_category_patch(categorys: Partialcategories, id: str):
@@ -80,8 +78,8 @@ def update_category_patch(categorys: Partialcategories, id: str):
     return db_category
 
 
-#____________delete_category_________________
 
+#____________delete_category_________________
 
 @category.delete("/delete_category")
 def delete_category(id: str):

@@ -14,7 +14,6 @@ db = Sessionlocal()
 
 #____________create shipping______________
 
-
 @Shippings.post("/create_shipping", response_model=ShippingCreate)
 def create_shipping(shippings: ShippingCreate):
     logger.info("Creating a new shipping record")
@@ -39,8 +38,8 @@ def create_shipping(shippings: ShippingCreate):
     return db_shipping
 
 
-#____________read shipping___________________
 
+#____________read shipping___________________
 
 @Shippings.get("/read_shipping", response_model=ShippingCreate)
 def get_shipping(shipping_id: str):
@@ -57,8 +56,8 @@ def get_shipping(shipping_id: str):
     return db_shipping
 
 
-#______________get all Shippings________________
 
+#______________get all Shippings________________
 
 @Shippings.get("/get_all_Shippings", response_model=List[ShippingCreate])
 def get_all_shipping():
@@ -73,6 +72,7 @@ def get_all_shipping():
     logger.info("All shipping records fetched successfully")
     
     return db_Shipping
+
 
 
 #_______________update shipping__________________
@@ -99,6 +99,7 @@ def update_shipping(shipping_id: str, shipping_update: ShippingCreate):
     return db_shipping
 
 
+
 #_______________delete shipping_____________________
 
 @Shippings.delete("/delete_shipping", response_model=ShippingCreate)
@@ -123,7 +124,6 @@ def delete_shipping(shipping_id: str):
 
 #_____________shippings_carrier________________
 
-
 @Shippings.get("/shippings_carrier", response_model=List[ShippingCreate])
 def search_by_carrier(carrier_name: str):
     logger.info(f"Searching shipping records by carrier name: {carrier_name}")
@@ -141,7 +141,6 @@ def search_by_carrier(carrier_name: str):
 
 
 #_____________________shipping_tracking___________________
-
 
 @Shippings.get("/shipping_tracking", response_model=ShippingCreate)
 def track_shipping(tracking_number: str):

@@ -16,9 +16,9 @@ from typing import List
 orders = APIRouter(tags=['orders'])
 db = Sessionlocal()
 
-#######################################################################################discount
 
-#create order
+
+#_________create order____________
 
 @orders.post("/create_orders", response_model=List[Allorder])
 def create_orders(order_data: ordern):
@@ -56,7 +56,7 @@ def create_orders(order_data: ordern):
 
 
 
-#get order
+#__________get order__________
 
 @orders.get("/get_orders",response_model=Allorder)
 def read_order(id:str):
@@ -66,7 +66,7 @@ def read_order(id:str):
     return db_order
 
 
-#cart
+# cart
 @orders.get("/get_orders_by_cart",response_model=List[Allorder])
 def read_order(cart_id: str):
         db_cart = db.query(Cart).filter(Cart.id == cart_id).first()
@@ -88,7 +88,7 @@ def read_order(cart_id: str):
         return orders
     
     
-#Retrieve all orders placed by a specific user.
+#_______Retrieve all orders placed by a specific user_______
 
 @orders.get("/get_orders_by_user", response_model=List[Allorder])
 def get_orders_by_user(user_id: str):
@@ -99,7 +99,7 @@ def get_orders_by_user(user_id: str):
 
 
 
-#Retrieve all orders containing a specific product.
+#______Retrieve all orders containing a specific product_________
 
 @orders.get("/get_orders_by_product", response_model=List[Allorder])
 def get_orders_by_product(product_id: str):
@@ -109,7 +109,8 @@ def get_orders_by_product(product_id: str):
     return orders
 
 
-#get all order
+
+#_______get all order______
 
 @orders.get("/get_all_orders",response_model=list[Allorder])
 def read_All_order():
@@ -120,8 +121,7 @@ def read_All_order():
 
 
 
-
-#update order
+#_______update order_________
 
 @orders.patch("/update_order", response_model=Allorder)
 def update_order(norder: UpdateOrder,id:str):
@@ -140,7 +140,7 @@ def update_order(norder: UpdateOrder,id:str):
 
 
 
-#delete order
+#_______delete order________
 
 @orders.delete("/delete_orders")
 def delete_orders(id:str):
@@ -159,7 +159,7 @@ def delete_orders(id:str):
 
 
 
-#cancle order
+#_________cancle order______
 
 @orders.put("/cancel_order")
 def cancel_order(order_id: str):
@@ -181,7 +181,7 @@ def cancel_order(order_id: str):
 
 
 
-#get order by user id
+#______get order by user id_______
 
 @orders.get("/search_order_by_user_id")
 def read_order_By_user_id(user_id :str):
@@ -192,7 +192,7 @@ def read_order_By_user_id(user_id :str):
 
 
 
-#get all order after date
+#_______get all order after date________
 
 @orders.get("/get_allorder_after_date", response_model=list[Allorder])
 def get_products_after_date(date: datetime):
@@ -203,7 +203,7 @@ def get_products_after_date(date: datetime):
 
 
 
-#get all order between two dates
+#_________get all order between two dates_________
 
 @orders.get("/get_allorder_between_two_dates", response_model=list[Allorder])
 def get_products_after_date(first_date: datetime,last_date: datetime):
@@ -214,7 +214,7 @@ def get_products_after_date(first_date: datetime,last_date: datetime):
 
 
 
-#get all users which status is done
+#________get all users which status is done___________
 
 @orders.get("/get_all_orders_status_done",response_model=list[Allorder])
 def read_All_order():
@@ -225,7 +225,7 @@ def read_All_order():
 
 
 
-#Reorder a Previous Order
+#_______Reorder a Previous Order__________
 
 @orders.post("/reorder/{order_id}", response_model=Allorder)
 def reorder(order_id: str):
@@ -247,9 +247,10 @@ def reorder(order_id: str):
     return new_order
 
 
-#archive_order
 
-@orders.patch("/archive_order/{order_id}")
+#________archive_order__________
+
+@orders.patch("/archive_order")
 def archive_order(order_id: str):
     order = db.query(Orders).filter(Orders.id == order_id, Orders.is_active == True, Orders.is_deleted == False).first()
     if not order:
@@ -261,8 +262,8 @@ def archive_order(order_id: str):
     db.commit()
     return {"message": "Order archived successfully"}
 
-#order conformation
 
+# order conformation
 
 def send_order_confirmation_email(email: str, order):
     order_details = f"Order ID: {order.id}\n" \
@@ -299,7 +300,7 @@ def send_order_confirmation_email(email: str, order):
         
         
         
-#order conformation email
+#_________order conformation email___________
 
 @orders.post("/send_order_conformation")
 def send_order_conformation(order_id:str):

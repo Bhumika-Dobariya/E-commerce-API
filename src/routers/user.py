@@ -159,7 +159,6 @@ def verify_otp_endpoint(request: OTPVerificationRequest):
 
 #__________________logging____________________
 
-
 @users.get("/logging")
 def logging(uname: str, password: str):
     db_user = db.query(User).filter(User.user_name == uname, User.is_active == True, User.is_verified == True, User.is_deleted == False).first()
@@ -180,7 +179,6 @@ def logging(uname: str, password: str):
 
 #_______________get user by token___________________
 
-
 @users.get("/get_user_by_token", response_model=UserAll)
 def read_user(token = Header(...)):
     user_id = decode_token_user_id(token)
@@ -192,8 +190,8 @@ def read_user(token = Header(...)):
     return db_user
 
 
-#___________get all users______________
 
+#___________get all users______________
 
 @users.get("/get_all_user", response_model=list[UserAll])
 def read_all_user():
@@ -204,8 +202,8 @@ def read_all_user():
     return db_users
 
 
-#______________update by put______________
 
+#______________update by put______________
 
 @users.put("/update_user_by_put", response_model=UserAll)
 def update_user(usern: UserAll, token: str = Header(...)):
@@ -236,7 +234,6 @@ def update_user(usern: UserAll, token: str = Header(...)):
 
 #_________update by patch______________
 
-
 @users.patch("/update_user_by_patch", response_model=UserAll)
 def update_emp_patch(user: PartialUser, token = Header(...)):
     user_id = decode_token_user_id(token)
@@ -262,7 +259,6 @@ def update_emp_patch(user: PartialUser, token = Header(...)):
 
 #_______delete user__________
 
-
 @users.delete("/delete_user_by_token")
 def delete_user(token = Header(...)):
     user_id = decode_token_user_id(token)
@@ -285,7 +281,6 @@ def delete_user(token = Header(...)):
 
 
 #___________forget password______________
-
 
 @users.put("/forget_password")
 def forget_password(user_newpass: str, token: str = Header(...)):

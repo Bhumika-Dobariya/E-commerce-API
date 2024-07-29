@@ -13,6 +13,7 @@ carts = APIRouter(tags=["Cart"])
 db = Sessionlocal()
 
 
+
 #_________create cart_______________
 
 @carts.post("/create_cart/")
@@ -26,8 +27,8 @@ def create_cart(user_id: str):
     return {"message": "Cart created successfully"}
 
 
-#___________add_item_to_cart______________
 
+#___________add_item_to_cart______________
 
 @carts.post("/add_item_to_cart", response_model=CartItemBase)
 def add_item_to_cart(cart_id: str, item: CartItemCreate):
@@ -69,6 +70,8 @@ def add_item_to_cart(cart_id: str, item: CartItemCreate):
         total_price=db_cart_item.total_price,
         status=item.status
     )
+
+
 
 #______________view_cart_______________
 
@@ -168,6 +171,7 @@ def remove_cart_item(cart_id: str, item_id: str):
     return {"message": "Cart item removed successfully", "cart_item_id": item_id}
 
 
+
 #_______________clear_cart_________________
 
 @carts.delete("/clear_cart")
@@ -187,8 +191,8 @@ def clear_cart(cart_id: str):
     return {"message": "Cart cleared successfully", "cart_id": cart_id}
 
 
-#_______________calculate_cart_total__________________
 
+#_______________calculate_cart_total__________________
 
 @carts.get("/calculate_cart_total")
 def calculate_cart_total(cart_id: str):
@@ -204,8 +208,8 @@ def calculate_cart_total(cart_id: str):
 
 
 
-#________________search_cart_by_user_id________________
 
+#________________search_cart_by_user_id________________
 
 @carts.get("/search_cart_by_user_id")
 def search_cart_by_user_id(user_id: str):
