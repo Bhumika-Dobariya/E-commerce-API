@@ -13,6 +13,8 @@ import uuid
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+import os
+
 
 pwd_context = CryptContext(schemes=["bcrypt"],deprecated = "auto")
 
@@ -71,9 +73,9 @@ def generate_otp(user_email: str):
 
 
 def send_otp_email(email: str, otp_code: str):
-    sender_email = "bhumikadobariya2412@gmail.com"
+    sender_email = os.getenv("sender_email")
     receiver_email = email
-    password = "qzdjaauunsmgrvgd"
+    password = os.getenv("password")
     subject = "Your OTP Code"
     message_text = f"Your OTP is {otp_code} which is valid for 10 minutes"
 
